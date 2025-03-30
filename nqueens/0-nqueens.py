@@ -2,46 +2,52 @@
 """ N queens """
 import sys
 
+def is_safe(board, row, col, N):
+    """Check if a queen can be placed at board safely (row, col)."""
+    for i in range(row):
+        if board[i] == col or \
+        board[i] - i == col - row or \
+        board[i] + i == col + row:
+            return False
+    return True
 
-if len(sys.argv) > 2 or len(sys.argv) < 2:
-    print("Usage: nqueens N")
-    exit(1)
+def solve_nqueens(board, row, N, solutions):
+    """Recursively place queens and store valid solutions."""
+    if row == N:
+        solutions.append([[i, board[i]] for i in range(N)])
+        return
 
-N = sys.argv[1]
+    for col in range(N):
+        if is_safe(board, row, col, N):
+            board[row] = col
+            solve_nqueens(board, row + 1, N, solutions)
 
-try:
-    N = int(N)
+def nqueens(N):
+    """Solve N-Queens problem and print all solutions."""
+    solutions = []
+    board = [-1] * N  # Each index represents a row, value represents column
+    solve_nqueens(board, 0, N, solutions)
 
-except:
-    print("N must be a number")
-    exit(1)
+    for solution in solutions:
+        print(solution)
 
-if int(sys.argv[1]) < 4:
-    print("N must be at least 4")
-    exit(1)
+def main():
+    """Handle input validation and call the solver."""
+    if len(sys.argv) != 2:
+        print("Usage: nqueens N")
+        sys.exit(1)
 
+    try:
+        N = int(sys.argv[1])
+    except ValueError:
+        print("N must be a number")
+        sys.exit(1)
 
-def queens(N, i=0, a=[], b=[], c=[]):
-    """ find possible positions """
-    if i < N:
-        for j in range(N):
-            if j not in a and i + j not in b and i - j not in c:
-                yield from queens(N, i + 1, a + [j], b + [i + j], c + [i - j])
-    else:
-        yield a
+    if N < 4:
+        print("N must be at least 4")
+        sys.exit(1)
 
+    nqueens(N)
 
-def solve(n):
-    """ solve """
-    k = []
-    i = 0
-    for solution in queens(N, 0):
-        for s in solution:
-            k.append([i, s])
-            i += 1
-        print(k)
-        k = []
-        i = 0
-
-
-solve(N)
+if __name__ == "__main__":
+    main()
