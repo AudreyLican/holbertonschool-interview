@@ -1,38 +1,32 @@
 #!/usr/bin/python3
-""" N queens """
 import sys
 
-def is_safe(board, row, col, N):
-    """Check if a queen can be placed at board safely (row, col)."""
+
+def is_safe(board, row, col):
+    """Check if placing a queen at (row, col) is safe."""
     for i in range(row):
         if board[i] == col or \
-        board[i] - i == col - row or \
-        board[i] + i == col + row:
+           board[i] - i == col - row or \
+           board[i] + i == col + row:
             return False
     return True
 
-def solve_nqueens(board, row, N, solutions):
-    """Recursively place queens and store valid solutions."""
+
+def solve_nqueens(N, row=0, board=[], solutions=[]):
+    """Use backtracking to solve the N queens problem."""
     if row == N:
-        solutions.append([[i, board[i]] for i in range(N)])
+        solution = [[i, board[i]] for i in range(N)]
+        solutions.append(solution)
         return
 
     for col in range(N):
-        if is_safe(board, row, col, N):
-            board[row] = col
-            solve_nqueens(board, row + 1, N, solutions)
+        if is_safe(board, row, col):
+            board.append(col)
+            solve_nqueens(N, row + 1, board, solutions)
+            board.pop()
 
-def nqueens(N):
-    """Solve N-Queens problem and print all solutions."""
-    solutions = []
-    board = [-1] * N  # Each index represents a row, value represents column
-    solve_nqueens(board, 0, N, solutions)
-
-    for solution in solutions:
-        print(solution)
 
 def main():
-    """Handle input validation and call the solver."""
     if len(sys.argv) != 2:
         print("Usage: nqueens N")
         sys.exit(1)
@@ -47,7 +41,12 @@ def main():
         print("N must be at least 4")
         sys.exit(1)
 
-    nqueens(N)
+    solutions = []
+    solve_nqueens(N, board=[], solutions=solutions)
+
+    for solution in solutions:
+        print(solution)
+
 
 if __name__ == "__main__":
     main()
