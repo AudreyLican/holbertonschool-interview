@@ -2,42 +2,34 @@
 
 const request = require('request');
 
-if (process.argv.length !== 3) {
-    console.log('Usage: node print_characters.js <movie_id>');
+const filmID = process.argv[2];
+if (!filmID || isNaN(filmID)) {
+    console.log('Invalid film ID, ./0-starwars_characters.js <film_id>');
     process.exit(1);
 }
 
-const movieId = process.argv[2];
-const filmUrl = `https://swapi.dev/api/films/${movieId}/`;
+const url = 'https://swapi-api.hbtn.io/api/films/' + filmID;
 
-request(filmUrl, (error, response, body) => {
+request(url, (error, response, body) => {
     if (error) {
-    console.error('Error fetching film:', error);
+    console.error('Error: ', error);
     return;
     }
 
-    if (response.statusCode !== 200) {
-    console.error('Failed to retrieve film data');
-    return;
+    const charData = JSON.parse(body).characters;
+
+    const printChars = (index) => {
+    if (index >= charData.length) {
+        return;
     }
-
-    const filmData = JSON.parse(body);
-    const characters = filmData.characters;
-
-  // Print characters one by one, in order
-    function printCharacter(index) {
-    if (index >= characters.length) return;
-
-    request(characters[index], (err, res, data) => {
-        if (!err && res.statusCode === 200) {
-        const character = JSON.parse(data);
-        console.log(character.name);
-        printCharacter(index + 1); // Recursively call next
-        } else {
-        console.error('Error fetching character:', err || res.statusCode);
+    request(charData[index], (error, response, body) => {
+        if (error) {
+        console.error('Error: ', error);
+        return;
         }
+        console.log(JSON.parse(body).name);
+        printCharrs(index + 1);
     });
-    }
-
-    printCharacter(0);
+    };
+    printChars(0);
 });
